@@ -19,6 +19,18 @@
 #' function accepts both the original Raven column names and their
 #' dot-converted equivalents.
 #'
+#' Selection table files are matched to WAV files using the following
+#' strategy (in order, stopping at the first match):
+#' \enumerate{
+#'   \item Exact name match: `<base>.txt`
+#'   \item Case-insensitive exact base-name match: any `.txt` file whose
+#'         name without extension equals `<base>`.
+#'   \item Raven Pro prefix match: any `.txt` file whose name starts with
+#'         `<base>.` (case-insensitive).  This covers Raven Pro's default
+#'         export names such as `<base>.Table 1 Selections 1.txt` and
+#'         `<base>.wav.Table 1 Selections 1.txt`.
+#' }
+#'
 #' @param wav_dir  Path to the directory containing source WAV files.
 #' @param sel_dir  Path to the directory containing Raven selection-table TXT
 #'   files.  Each TXT file must share its base name with a WAV file in
@@ -180,7 +192,15 @@ raven_wav_cut <- function(wav_dir, sel_dir, out_dir) {
 
 #' Find a Raven selection-table file for a given WAV base name
 #'
-#' Performs a case-insensitive search for `<wav_base>.txt` inside `sel_dir`.
+#' Performs a case-insensitive search inside `sel_dir`.  Three strategies
+#' are tried in order:
+#' 1. Exact file `<wav_base>.txt`.
+#' 2. Case-insensitive base-name match: any `.txt` file whose name without
+#'    extension equals `<wav_base>`.
+#' 3. Raven Pro prefix match: any `.txt` file whose name starts with
+#'    `<wav_base>.` — covering Raven Pro default names such as
+#'    `<base>.Table 1 Selections 1.txt` and
+#'    `<base>.wav.Table 1 Selections 1.txt`.
 #'
 #' @param sel_dir  Directory to search.
 #' @param wav_base Base name of the WAV file (no extension).
@@ -188,15 +208,25 @@ raven_wav_cut <- function(wav_dir, sel_dir, out_dir) {
 #' @return Full path to the matching TXT file, or `NULL` if not found.
 #' @keywords internal
 .find_sel_file <- function(sel_dir, wav_base) {
-  # Exact match first
+  # 1. Exact match
   exact <- file.path(sel_dir, paste0(wav_base, ".txt"))
   if (file.exists(exact)) return(exact)
 
-  # Case-insensitive fallback
+  # Gather all .txt files for the remaining checks
   all_txt <- list.files(sel_dir, pattern = "\\.txt$",
                         ignore.case = TRUE, full.names = FALSE)
-  bases   <- tools::file_path_sans_ext(all_txt)
-  hit     <- which(tolower(bases) == tolower(wav_base))
-  if (length(hit) == 0L) return(NULL)
-  file.path(sel_dir, all_txt[hit[1L]])
+
+  # 2. Case-insensitive exact base-name match
+  bases <- tools::file_path_sans_ext(all_txt)
+  hit   <- which(tolower(bases) == tolower(wav_base))
+  if (length(hit) > 0L) return(file.path(sel_dir, all_txt[hit[1L]]))
+
+  # 3. Raven Pro prefix match: filename starts with <wav_base>. (case-insensitive)
+  #    Handles names like "recording.Table 1 Selections 1.txt" and
+  #    "recording.wav.Table 1 Selections 1.txt".
+  prefix <- tolower(paste0(wav_base, "."))
+  hit    <- which(startsWith(tolower(all_txt), prefix))
+  if (length(hit) > 0L) return(file.path(sel_dir, all_txt[hit[1L]]))
+
+  NULL
 }
