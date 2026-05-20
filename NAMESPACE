@@ -1,0 +1,5 @@
+export(raven_wav_cut)
+importFrom(tuneR,extractWave)
+importFrom(tuneR,readWave)
+importFrom(tuneR,writeWave)
+importFrom(tools,file_path_sans_ext)
