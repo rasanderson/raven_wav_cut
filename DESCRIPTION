@@ -1,0 +1,18 @@
+Package: ravenwavcut
+Title: Cut WAV Files Based on Raven Selection Tables
+Version: 0.1.0
+Authors@R: 
+    person("Neil", "Anderson", role = c("aut", "cre"),
+           email = "n.anderson@ncl.ac.uk")
+Description: Takes a folder of WAV files and a folder of Raven Pro selection
+    tables (tab-delimited TXT files) with matching file prefixes, and extracts
+    each selection as a separate WAV file into an output folder. Output files
+    are named after the source WAV file with a zero-padded numeric suffix
+    (_01, _02, _03, etc.) corresponding to the selection number.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports:
+    tuneR,
+    tools
