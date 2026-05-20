@@ -4,6 +4,10 @@
 #' (a tab-delimited `.txt` file with the same base name) in `sel_dir`, and
 #' writes each selection as a separate WAV file to `out_dir`.
 #'
+#' WAV files that have no matching selection table in `sel_dir` are silently
+#' skipped with an informational message — this is treated as normal behaviour
+#' rather than an error or warning.
+#'
 #' Output files are named `<base>_01.wav`, `<base>_02.wav`, ... where
 #' `<base>` is the original WAV file name without its extension and the
 #' numeric suffix is zero-padded to at least two digits (more digits are
@@ -70,7 +74,7 @@ raven_wav_cut <- function(wav_dir, sel_dir, out_dir) {
     # ── Find matching selection table ──────────────────────────────────────────
     sel_file <- .find_sel_file(sel_dir, wav_base)
     if (is.null(sel_file)) {
-      warning("No selection table found for '", wav_base, "' — skipping.")
+      message("No selection table found for '", wav_base, "' — skipping.")
       next
     }
 
