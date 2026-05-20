@@ -58,7 +58,18 @@ tab-delimited text.  The only columns it needs are:
 
 All other columns are ignored.
 
-### WAV files without a selection table
+### Selection table naming
+
+The function matches each WAV file to a selection table using the following
+strategy (first match wins, all comparisons are case-insensitive):
+
+1. **Exact name**: `<base>.txt`  (e.g. `morning_chorus.txt`)
+2. **Base-name match**: any `.txt` file whose name without extension equals
+   `<base>`
+3. **Raven Pro prefix**: any `.txt` file whose name starts with `<base>.`
+   — this covers Raven Pro's default export names such as
+   `morning_chorus.Table 1 Selections 1.txt` and
+   `morning_chorus.wav.Table 1 Selections 1.txt`
 
 If a WAV file in `wav_dir` has no matching `.txt` file in `sel_dir`, it is
 silently skipped with an informational message.  This is expected behaviour —
