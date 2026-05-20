@@ -58,6 +58,12 @@ tab-delimited text.  The only columns it needs are:
 
 All other columns are ignored.
 
+### WAV files without a selection table
+
+If a WAV file in `wav_dir` has no matching `.txt` file in `sel_dir`, it is
+silently skipped with an informational message.  This is expected behaviour —
+you do not need a selection table for every WAV file.
+
 ## Output naming
 
 Output files follow the pattern `<source_base>_NN.wav` where `NN` is a
